@@ -87,7 +87,7 @@ def discriminator_loss(logits_real, logits_fake):
     return loss
 
 
-def generate_loss(logits_fake, generator_out, od_right_attribute_position, od_input, beta):
+def generate_loss(logits_fake, generator_out, od_right_attribute_position, od_input, beta, a):
     """
     生成器的损失函数
     :param real_data:
@@ -111,7 +111,7 @@ def generate_loss(logits_fake, generator_out, od_right_attribute_position, od_in
         else:
             generator_out_data = torch.cat([generator_out_data, tmp], dim=1)
 
-    loss = bce_loss(logits_fake, true_labels) + beta * mse_loss(generator_out_data, od_input)
+    loss = bce_loss(logits_fake, true_labels) + beta * mse_loss(generator_out_data, od_input) + a* mse_loss(generator_out_data, od_input)
     return loss
 
 
@@ -209,7 +209,7 @@ def run():
 
             g_error = generate_loss(gen_logits_fake, fake_data_g, RIGHT_ATTRIBUTES_POSITION,
                                     od_right_attribute_g,
-                                    beta=0.5)
+                                    beta=1, a=1)
 
             G_optim.zero_grad()
             g_error.backward(retain_graph=True)
